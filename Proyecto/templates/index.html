@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictor de palabras CAA</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .predict-button {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .predict-button:hover {
+            background-color: #45a049;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .categories {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .category-btn {
+            padding: 15px;
+            text-align: left;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .category-btn.conversacion { 
+            background-color: #FFE44D;
+        }
+
+        .category-btn.dolor { 
+            background-color: #FF5252;
+            color: white;
+        }
+
+        .category-btn.emocional { 
+            background-color: #FF4081;
+            color: white;
+        }
+
+        .category-btn.necesidades { 
+            background-color: #7C4DFF;
+            color: white;
+        }
+
+        .category-btn.actividades { 
+            background-color: #40C4FF;
+        }
+
+        .icons-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .icon-card {
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+        }
+
+        .icon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .icon-card img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .icon-card span {
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #predictions {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            min-height: 50px;
+        }
+
+        .prediction-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 16px;
+            background: #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .prediction-item:hover {
+            background: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Predictor de palabras CAA</h1>
+        
+        <div class="input-section">
+            <div class="input-container">
+                <input type="text" id="input-text" placeholder="Escribe aquí...">
+                <button class="predict-button" onclick="getPredictions()">Predecir</button>
+            </div>
+            <div id="predictions"></div>
+        </div>
+
+        <div class="main-content">
+            <div class="categories">
+                <button class="category-btn conversacion" onclick="showCategory('conversacion')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                    Conversación
+                </button>
+                <button class="category-btn dolor" onclick="showCategory('dolor')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v1"/><path d="M12 21v1"/><path d="M20 12h1"/><path d="M3 12h1"/><path d="M19 3l-1 1"/><path d="M5 3l1 1"/><path d="M19 21l-1-1"/><path d="M5 21l1-1"/><path d="M8 14a6 6 0 1 0 8 0"/><path d="M12 12v6"/></svg>
+                    Dolor físico
+                </button>
+                <button class="category-btn emocional" onclick="showCategory('emocional')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    Situación emocional
+                </button>
+                <button class="category-btn necesidades" onclick="showCategory('necesidades')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+                    Necesidades básicas
+                </button>
+                <button class="category-btn actividades" onclick="showCategory('actividades')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    Actividades
+                </button>
+            </div>
+
+            <div class="icons-grid" id="icons-container">
+                <!-- Los iconos se cargarán dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para los iconos
+        const iconsByCategory = {
+            conversacion: [
+                { image: '/static/images/conversacion/hola.png', text: 'Hola' },
+                { image: '/static/images/conversacion/adios.png', text: 'Adiós' },
+                { image: '/static/images/conversacion/gracias.png', text: 'Gracias' },
+                { image: '/static/images/conversacion/porfavor.png', text: 'Por favor' }
+            ],
+            dolor: [
+                { image: '/static/images/dolor/cabeza.png', text: 'Cabeza' },
+                { image: '/static/images/dolor/estomago.png', text: 'Estómago' },
+                { image: '/static/images/dolor/brazo.png', text: 'Brazo' },
+                { image: '/static/images/dolor/pierna.png', text: 'Pierna' }
+            ],
+            emocional: [
+                { image: '/static/images/emocional/feliz.png', text: 'Feliz' },
+                { image: '/static/images/emocional/triste.png', text: 'Triste' },
+                { image: '/static/images/emocional/enojado.png', text: 'Enojado' },
+                { image: '/static/images/emocional/cansado.png', text: 'Cansado' }
+            ],
+            necesidades: [
+                { image: '/static/images/necesidades/hambre.png', text: 'Hambre' },
+                { image: '/static/images/necesidades/sed.png', text: 'Sed' },
+                { image: '/static/images/necesidades/banio.png', text: 'Baño' },
+                { image: '/static/images/necesidades/dormir.png', text: 'Dormir' }
+            ],
+            actividades: [
+                { image: '/static/images/actividades/jugar.png', text: 'Jugar' },
+                { image: '/static/images/actividades/leer.png', text: 'Leer' },
+                { image: '/static/images/actividades/pasear.png', text: 'Pasear' },
+                { image: '/static/images/actividades/musica.png', text: 'Música' }
+            ]
+        };
+
+        function showCategory(category) {
+            const container = document.getElementById('icons-container');
+            container.innerHTML = '';
+            
+            const icons = iconsByCategory[category] || [];
+            icons.forEach(icon => {
+                const card = document.createElement('div');
+                card.className = 'icon-card ' + category;
+                card.innerHTML = `
+                    <img src="${icon.image}" alt="${icon.text}">
+                    <span>${icon.text}</span>
+                `;
+                card.onclick = () => selectIcon(icon.text);
+                container.appendChild(card);
+            });
+        }
+
+        function selectIcon(text) {
+            const input = document.getElementById('input-text');
+            input.value += (input.value ? ' ' : '') + text;
+            getPredictions();
+        }
+
+        async function getPredictions() {
+            const input = document.getElementById('input-text');
+            const predictionsContainer = document.getElementById('predictions');
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input: input.value })
+                });
+                
+                const data = await response.json();
+                
+                predictionsContainer.innerHTML = '';
+                data.predictions.forEach(prediction => {
+                    const predictionElement = document.createElement('span');
+                    predictionElement.className = 'prediction-item';
+                    predictionElement.textContent = prediction;
+                    predictionElement.onclick = () => {
+                        input.value = prediction;
+                        getPredictions();
+                    };
+                    predictionsContainer.appendChild(predictionElement);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Mostrar la categoría de conversación por defecto
+        showCategory('conversacion');
+    </script>
+</body>
+</html>

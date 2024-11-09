@@ -1,0 +1,76 @@
+ Guía de Instalación - Predictor de Palabras CAA
+
+ Requisitos del Sistema
+- Python 3.7 o superior
+- pip (gestor de paquetes de Python)
+- Suficiente espacio en disco (aproximadamente 2GB para los modelos y dependencias)
+- RAM recomendada: 8GB o superior
+
+ Instalación de Dependencias
+
+1. Instala todas las dependencias necesarias ejecutando el siguiente comando:
+```bash
+pip install flask transformers torch nltk fuzzywuzzy python-Levenshtein
+```
+
+2. Descarga los recursos necesarios de NLTK ejecutando Python y corriendo los siguientes comandos:
+```python
+import nltk
+nltk.download('cess_esp')
+```
+
+3. Asegúrate de tener la estructura de archivos correcta:
+```
+proyecto/
+├── app.py
+├── templates/
+│   └── index.html
+├── static/
+│   ├── css/
+│   └── js/
+```
+
+ Verificación de la Instalación
+
+Para verificar que todo está instalado correctamente, puedes ejecutar Python y probar las siguientes importaciones:
+```python
+import flask
+import transformers
+import torch
+import nltk
+from fuzzywuzzy import fuzz
+```
+
+Si no hay mensajes de error, la instalación fue exitosa.
+
+ Ejecutar la Aplicación
+
+1. Asegúrate de estar en el directorio del proyecto
+2. Ejecuta la aplicación:
+```bash
+python app.py
+```
+3. Abre tu navegador y ve a `http://localhost:5000`
+
+ Solución de Problemas Comunes
+
+1. Si hay problemas con torch:
+```bash
+pip uninstall torch
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+2. Si hay problemas con el modelo de español:
+```bash
+pip install sentencepiece
+```
+
+3. Si hay problemas con NLTK:
+```python
+import nltk
+nltk.download('all')
+```
+
+ Notas Importantes
+
+- La primera vez que se ejecute la aplicación, se descargará automáticamente el modelo de lenguaje en español, lo cual puede tomar varios minutos dependiendo de tu conexión a internet.
